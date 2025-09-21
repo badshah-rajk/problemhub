@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Problem Hub | Team Alpha</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* --- Global Styles --- */
+* { box-sizing: border-box; margin:0; padding:0; font-family:'Orbitron', sans-serif;}
+html { scroll-behavior: smooth; }
+body { min-height:100vh; color:#fff; display:flex; flex-direction:column; overflow-x:hidden; padding:0; }
+
+/* --- Background Pattern --- */
+.background-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Behind all content */
+  background-color: #313131;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
+  background-size: 30px 30px;
+  background-position: -5px -5px;
+}
+
+/* --- Navbar --- */
+.navbar { width:100%; background: rgba(0,0,0,0.7); display:flex; justify-content:space-between; align-items:center; padding:15px 30px; position:sticky; top:0; z-index:999; }
+.navbar .logo { font-size:1.5rem; font-weight:bold; color:#0ff; }
+.navbar ul { list-style:none; display:flex; gap:25px; }
+.navbar ul li a { color:#fff; font-weight:bold; transition:0.3s; }
+.navbar ul li a:hover { color:#0ff; }
+
+/* Hamburger for mobile */
+.hamburger { display:none; flex-direction:column; cursor:pointer; gap:5px; }
+.hamburger div { width:25px; height:3px; background:#0ff; border-radius:2px; transition:0.3s; }
+@media(max-width:768px){
+  .navbar ul { position:fixed; top:0; right:-100%; height:100vh; width:200px; background:rgba(0,0,0,0.95); flex-direction:column; align-items:center; justify-content:center; gap:30px; transition:0.4s; }
+  .navbar ul.active { right:0; }
+  .hamburger { display:flex; }
+  .hamburger.open div:nth-child(1){ transform: rotate(45deg) translate(5px,5px);}
+  .hamburger.open div:nth-child(2){ opacity:0;}
+  .hamburger.open div:nth-child(3){ transform: rotate(-45deg) translate(5px,-5px);}
+}
+
+/* --- Container --- */
+.container { background: rgba(0,0,0,0.7); padding:30px 20px; border-radius:20px; max-width:700px; width:90%; margin:20px auto; z-index:1; 
+  /* Glow only on form container */
+  box-shadow:0 0 10px #0ff,0 0 20px #0ff;
+}
+h1 { text-align:center; margin-bottom:20px; color:#0ff; font-size:1.8rem; }
+
+/* --- About Section Styles --- */
+.about-container {
+  background: rgba(0,0,0,0.7);
+  padding: 30px 20px;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 90%;
+  margin: 20px auto;
+  z-index: 1;
+  box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.about-content {
+  text-align: center;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.about-content h1 {
+  color: #0ff;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+}
+
+.about-content p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.about-content .highlight {
+  color: #0ff;
+  font-weight: bold;
+}
+
+.mission-box {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid #0ff;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 25px 0;
+}
+
+.mission-box h3 {
+  color: #0ff;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+/* --- Form Styles --- */
+form { display:flex; flex-direction:column; width:100%; }
+label { margin-top:12px; margin-bottom:6px; font-weight:bold; color:#0ff; font-size:1rem; }
+input, textarea, select { padding:12px; border-radius:10px; border:none; background: rgba(255,255,255,0.15); color:#fff; font-size:1rem; font-weight:bold; outline:none; text-shadow:none; transition:0.3s; width:100%; }
+input:focus, textarea:focus, select:focus { background: rgba(255,255,255,0.25); box-shadow:0 0 6px #0ff; }
+textarea { resize: vertical; min-height:70px; }
+
+/* Dropdown Arrow */
+select { -webkit-appearance:none; -moz-appearance:none; appearance:none; background-image: linear-gradient(45deg, transparent 50%, #0ff 50%), linear-gradient(135deg, #0ff 50%, transparent 50%); background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px); background-size:5px 5px,5px 5px; background-repeat:no-repeat; }
+select option { color:#000; background:#fff; }
+
+/* Radio Buttons */
+.radio-group { display:flex; gap:12px; flex-wrap:wrap; }
+.radio-group label { display:flex; align-items:center; gap:5px; font-weight:normal; cursor:pointer; color:#0ff; font-size:0.95rem; }
+input[type="radio"] { accent-color:#0ff; }
+
+/* Buttons with glow */
+.btn { margin-top:20px; padding:12px; border:none; border-radius:10px; background:linear-gradient(90deg,#0ff,#00f); color:#000; font-weight:bold; cursor:pointer; transition:0.3s; box-shadow:0 0 6px #0ff,0 0 12px #0ff; font-size:1rem; }
+.btn:hover { transform:scale(1.03); box-shadow:0 0 12px #0ff,0 0 20px #0ff; }
+
+/* Multi-Step Form */
+.form-step { display:none; flex-direction:column; }
+.form-step.active { display:flex; animation:fadeSlide 0.5s ease-in-out; }
+
+/* Confirmation */
+.confirmation { text-align:center; font-size:1.5rem; color:#0ff; margin-top:20px; display:none; }
+
+/* Animations */
+@keyframes fadeIn { from {opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
+@keyframes fadeSlide { from {opacity:0; transform:translateX(50px);} to {opacity:1; transform:translateX(0);} }
+
+/* Intro Modal */
+.modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:flex; justify-content:center; align-items:center; z-index:1000; padding:10px; overflow-y:auto; animation:fadeIn 0.8s ease; }
+.modal-content { background: rgba(0,0,0,0.95); padding:25px 20px; border-radius:20px; max-width:600px; width:100%; text-align:center; color:#0ff; font-size:1.1rem; line-height:1.5; }
+
+/* Blur background when modal is active */
+body.modal-open .container,
+body.modal-open .about-container,
+body.modal-open .navbar {
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+/* Section hiding */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+
+/* Responsive Adjustments */
+@media(max-width:768px){ 
+  h1{font-size:1.5rem;} 
+  .modal-content{font-size:1rem;} 
+  .btn{font-size:0.95rem;padding:10px;} 
+  textarea{font-size:0.95rem;} 
+  input, select{font-size:0.95rem;} 
+  .radio-group label{font-size:0.9rem;} 
+  .about-content p{font-size:0.95rem;}
+  .mission-box h3{font-size:1.1rem;}
+}
+@media(max-width:480px){ 
+  .container, .about-container{padding:20px 15px;} 
+  h1{font-size:1.3rem;} 
+  .modal-content{padding:20px 15px;} 
+  .btn{font-size:0.9rem;padding:8px;} 
+  .about-content p{font-size:0.9rem;}
+  .mission-box h3{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- Background Pattern -->
+<div class="background-pattern"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="logo">Team Alpha</div>
+  <ul id="nav-links">
+    <li><a href="#" onclick="showSection('home')">Home</a></li>
+    <li><a href="#" onclick="showSection('submit')">Submit Problem</a></li>
+    <li><a href="#" onclick="showSection('about')">About</a></li>
+    <li><a href="#" onclick="showSection('contact')">Contact</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger">
+    <div></div><div></div><div></div>
+  </div>
+</nav>
+
+<!-- Intro Modal -->
+<div id="introModal" class="modal">
+  <div class="modal-content">
+    <h2>Welcome to Problem Hub 💡</h2>
+    <p>This website has been developed by <strong>Raj Kumar</strong>.<br>
+    It is a project by <strong>Team Alpha</strong>, working to understand the problems faced by people in daily life and provide solutions.</p>
+    <button class="btn" id="closeIntro">Got it ✅</button>
+  </div>
+</div>
+
+<!-- Home Section -->
+<div id="home" class="section active">
+  <div class="container">
+    <h1>Welcome to Problem Hub 💡</h1>
+    <div style="text-align: center; line-height: 1.6;">
+      <p style="font-size: 1.1rem; margin-bottom: 20px;">
+        Share your daily problems with us and get innovative solutions from <span style="color: #0ff; font-weight: bold;">Team Alpha</span>
+      </p>
+      <button class="btn" onclick="showSection('submit')">Start Sharing Your Problems ➡️</button>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Problem Section -->
+<div id="submit" class="section">
+  <div class="container">
+    <h1>Share Your Problem 💡</h1>
+    <form id="problemForm" action="https://formspree.io/f/movkaqqe" method="POST">
+      <!-- Step 1 -->
+      <div class="form-step active">
+        <label for="role">Role</label>
+        <select id="role" name="role" required>
+          <option value="" disabled selected>Select your role</option>
+          <option value="Student">Student</option>
+          <option value="Teacher">Teacher</option>
+          <option value="Professional">Professional</option>
+          <option value="Others">Others</option>
+        </select>
+
+        <label for="problem">Problem Faced</label>
+        <textarea id="problem" name="problem" rows="3" required></textarea>
+
+        <button type="button" class="btn" onclick="nextStep()">Next ➡️</button>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="form-step">
+        <label for="situation">Situation / Context</label>
+        <textarea id="situation" name="situation" rows="3" required></textarea>
+
+        <label for="feelings">Feelings</label>
+        <textarea id="feelings" name="feelings" rows="3" required></textarea>
+
+        <label for="impact">Impact</label>
+        <textarea id="impact" name="impact" rows="3" required></textarea>
+
+        <button type="button" class="btn" onclick="prevStep()">⬅️ Back</button>
+        <button type="button" class="btn" onclick="nextStep()">Next ➡️</button>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="form-step">
+        <label for="attempts">Attempts to Solve</label>
+        <textarea id="attempts" name="attempts" rows="3" required></textarea>
+
+        <label for="solution">Solution Wish</label>
+        <textarea id="solution" name="solution" rows="3" required></textarea>
+
+        <label>How did you discover this tool?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="discovery" value="YouTube 🎥" required> YouTube 🎥</label>
+          <label><input type="radio" name="discovery" value="Instagram 📱"> Instagram 📱</label>
+          <label><input type="radio" name="discovery" value="Friends/Family 👥"> Friends/Family 👥</label>
+          <label><input type="radio" name="discovery" value="Google 🔍"> Google 🔍</label>
+          <label><input type="radio" name="discovery" value="ChatGPT 🤖"> ChatGPT 🤖</label>
+          <label><input type="radio" name="discovery" value="Other" id="otherOption"> Other
+            <input type="text" id="otherText" name="discovery_other" placeholder="Specify" style="display:none;margin-left:5px;">
+          </label>
+        </div>
+
+        <button type="button" class="btn" onclick="prevStep()">⬅️ Back</button>
+        <button type="button" class="btn" onclick="nextStep()">Next ➡️</button>
+      </div>
+
+      <!-- Step 4 - Contact Information -->
+      <div class="form-step">
+        <div style="text-align: center; margin-bottom: 25px; padding: 15px; background: rgba(0, 255, 255, 0.1); border: 1px solid #0ff; border-radius: 10px;">
+          <h3 style="color: #0ff; margin-bottom: 10px; font-size: 1.2rem;">📞 Stay Connected</h3>
+          <p style="color: #fff; font-size: 0.95rem; line-height: 1.4;">
+            We collect this information <span style="color: #0ff; font-weight: bold;">only</span> to contact you with personalized solutions and notify you about the status of your problem being solved.
+          </p>
+        </div>
+
+        <label for="email">Email Address (Optional)</label>
+        <input type="email" id="email" name="email" placeholder="your.email@example.com">
+
+        <label for="phone">Phone Number (Optional)</label>
+        <input type="tel" id="phone" name="phone" placeholder="+91 98765 43210">
+
+        <div style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #aaa; line-height: 1.3;">
+          <p>🔒 Your information is secure and will not be shared with third parties.</p>
+        </div>
+
+        <button type="button" class="btn" onclick="prevStep()">⬅️ Back</button>
+        <button type="submit" class="btn">Submit Problem ✅</button>
+      </div>
+    </form>
+
+    <div class="confirmation" id="confirmation">
+      Thank you for sharing your problem 💡
+    </div>
+  </div>
+</div>
+
+<!-- About Section -->
+<div id="about" class="section">
+  <div class="about-container">
+    <div class="about-content">
+      <h1>About Team Alpha 🌟</h1>
+      
+      <p>
+        <span class="highlight">Team Alpha</span> is a passionate group of teenagers dedicated to making a real difference in people's lives. We believe that every problem has a solution, and every voice deserves to be heard.
+      </p>
+      
+      <p>
+        Our team consists of young, enthusiastic individuals who are committed to collecting information about the problems people face in their daily lives. We don't just listen – we act. By gathering these insights, we work tirelessly to develop <span class="highlight">innovative and creative solutions</span> that can genuinely help improve your everyday experiences.
+      </p>
+      
+      <div class="mission-box">
+        <h3>Our Mission 🎯</h3>
+        <p>
+          To bridge the gap between problems and solutions by creating a platform where people can freely share their challenges, knowing that a dedicated team of young minds is working to find practical, innovative answers.
+        </p>
+      </div>
+      
+      <p>
+        What makes us unique is our fresh perspective. As teenagers, we understand the modern challenges that people face, from technology-related issues to social and academic pressures. We combine this understanding with our natural creativity and passion for problem-solving.
+      </p>
+      
+      <p>
+        Every problem you share with us is valued and carefully analyzed. Our team brainstorms together, researches extensively, and develops solutions that are not just theoretical but <span class="highlight">practical and implementable</span> in real life.
+      </p>
+      
+      <p style="margin-top: 30px; font-size: 1.1rem; color: #0ff;">
+        Join us in creating a world where no problem goes unsolved! 🚀
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Section -->
+<div id="contact" class="section">
+  <div class="about-container">
+    <div class="about-content">
+      <h1>Contact Us 📞</h1>
+      
+      <p>
+        Have questions about our project? Want to collaborate with <span class="highlight">Team Alpha</span>? We'd love to hear from you!
+      </p>
+      
+      <div class="mission-box">
+        <h3>Get In Touch 💬</h3>
+        <p>
+          Feel free to reach out to us through the problem submission form, or connect with us on social media. We're always excited to engage with our community and hear your feedback.
+        </p>
+        <p style="margin-top: 15px;">
+          <span class="highlight">Email:</span> <a href="mailto:irajxdev@gmail.com" style="color: #0ff; text-decoration: none;">irajxdev@gmail.com</a>
+        </p>
+      </div>
+      
+      <p>
+        Our team is constantly working to improve our platform and develop better solutions. Your input and suggestions are invaluable to us in this journey.
+      </p>
+      
+      <button class="btn" onclick="showSection('submit')">Share Your Problem With Us 💡</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Navbar Hamburger
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+hamburger.addEventListener('click', () => { 
+  navLinks.classList.toggle('active'); 
+  hamburger.classList.toggle('open'); 
+});
+
+// Close mobile menu when clicking on a link
+navLinks.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A') {
+    navLinks.classList.remove('active');
+    hamburger.classList.remove('open');
+  }
+});
+
+// Section Navigation
+function showSection(sectionName) {
+  // Hide all sections
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(section => section.classList.remove('active'));
+  
+  // Show selected section
+  document.getElementById(sectionName).classList.add('active');
+  
+  // Reset form if switching away from submit section
+  if (sectionName !== 'submit') {
+    resetForm();
+  }
+}
+
+// Reset form function
+function resetForm() {
+  currentStep = 0;
+  showStep(currentStep);
+  document.getElementById('problemForm').style.display = 'flex';
+  document.getElementById('confirmation').style.display = 'none';
+  document.getElementById('problemForm').reset();
+}
+
+// Intro Modal
+const introModal = document.getElementById('introModal');
+const closeIntro = document.getElementById('closeIntro');
+window.addEventListener('load', () => { 
+  introModal.style.display = 'flex';
+  document.body.classList.add('modal-open'); // blur background
+});
+closeIntro.addEventListener('click', () => { 
+  introModal.style.display = 'none';
+  document.body.classList.remove('modal-open'); // remove blur
+});
+
+// Multi-Step Form
+let currentStep = 0;
+const steps = document.querySelectorAll('.form-step');
+function showStep(n){ steps.forEach((step,i)=>step.classList.remove('active')); steps[n].classList.add('active'); }
+function nextStep(){ if(currentStep<steps.length-1){ currentStep++; showStep(currentStep); } }
+function prevStep(){ if(currentStep>0){ currentStep--; showStep(currentStep); } }
+
+// Show/hide "Other" text input
+const otherOption = document.getElementById('otherOption');
+const otherText = document.getElementById('otherText');
+otherOption.addEventListener('change', ()=>{ otherText.style.display = otherOption.checked ? 'inline-block':'none'; });
+
+// Form Submission
+document.getElementById('problemForm').addEventListener('submit', function(e){
+  if(otherOption.checked && otherText.value.trim()){
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type='hidden'; hiddenInput.name='discovery'; hiddenInput.value=otherText.value;
+    this.appendChild(hiddenInput);
+    otherText.disabled=true;
+  }
+  setTimeout(()=>{ 
+    this.style.display='none'; 
+    document.getElementById('confirmation').style.display='block'; 
+  }, 100);
+});
+</script>
+
+</body>
+</html>
